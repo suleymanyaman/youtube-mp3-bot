@@ -12,7 +12,7 @@ import time
 import os
 from turkish import capitalize
 from datetime import datetime
-from threading import Thread
+
 
 q=Queue()
 reg={}
