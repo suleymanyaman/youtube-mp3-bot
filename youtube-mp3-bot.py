@@ -12,10 +12,11 @@ import time
 import os
 from turkish import capitalize
 from datetime import datetime
+from threading import Thread
 
 q=Queue()
 reg={}
-
+songs=[]
 file = open("C:/Users/asus/youtube-mp3-log.txt","a")
 
 def pulldata(query):
@@ -56,6 +57,8 @@ def pulldata(query):
 
 
 
+
+
 def exists(path):
     try:
         st = os.stat(path)
@@ -67,15 +70,23 @@ def exists(path):
 
 opt = Options()
 opt.add_argument("--disable-notifications")
-driver = webdriver.Chrome(chrome_options=opt,executable_path="C:\chromedriver.exe")
 
-def download(url):
+n_of_songs = int(input("Kaç şarkı indirmek istiyorsunuz?"))
+for i in range(n_of_songs):
+    name = input("Şarkı-{}:".format(i+1))
+    songs.append(name)
+
+print("İndirme başlatılacak. Lütfen bekleyin...")
+for song in songs:
+    pulldata(song)
 
 
+driver = webdriver.Chrome(chrome_options=opt, executable_path="C:\chromedriver.exe")
+
+for get in range(len(songs)):
     driver.get("https://www.onlinevideoconverter.com/mp3-converter")
-
     element = driver.find_element_by_name("texturl")
-    element.send_keys(url, Keys.ENTER)
+    element.send_keys(q.get(), Keys.ENTER)
 
 
     try:
@@ -84,32 +95,15 @@ def download(url):
         downloadElem.click()
         driver.switch_to.window(window_before)
 
-
-
-
-
     except TimeoutException:
-        print("Timeout Error")
+        print("Timeout Error or Copyright issues!")
 
 
 
-
-n_of_songs = int(input("Kaç şarkı indirmek istiyorsunuz?"))
-for i in range(n_of_songs):
-    name = input("Şarkı-{}:".format(i+1))
-    print("Kuyruğa ekleniyor. Lütfen bekleyiniz....")
-    pulldata(name)
-
-
-
-print("İndirme başlatılacak. Lütfen bekleyiniz....")
-for i in range(n_of_songs):
-    download(q.get())
 
 
 
 last_item = list(reg.values())[len(reg)-1]
-
 while True:
     time.sleep(0.5)
     if exists("C:/Users/asus/Downloads/"+last_item+".mp3"):
@@ -117,7 +111,6 @@ while True:
         driver.quit()
         file.close()
         break
-
 
 
 
